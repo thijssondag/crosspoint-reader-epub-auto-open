@@ -11,6 +11,7 @@
 #include "home/HomeActivity.h"
 #include "home/RecentBooksActivity.h"
 #include "network/CrossPointWebServerActivity.h"
+#include "network/QuickFileTransferActivity.h"
 #include "reader/ReaderActivity.h"
 #include "settings/OpdsServerListActivity.h"
 #include "settings/SettingsActivity.h"
@@ -170,6 +171,10 @@ void ActivityManager::goToFileTransfer() {
   replaceActivity(std::make_unique<CrossPointWebServerActivity>(renderer, mappedInput));
 }
 
+void ActivityManager::goToQuickFileTransfer() {
+  replaceActivity(std::make_unique<QuickFileTransferActivity>(renderer, mappedInput));
+}
+
 void ActivityManager::goToSettings() { replaceActivity(std::make_unique<SettingsActivity>(renderer, mappedInput)); }
 
 void ActivityManager::goToFileBrowser(std::string path) {
@@ -233,6 +238,10 @@ bool ActivityManager::preventAutoSleep() const { return currentActivity && curre
 bool ActivityManager::isReaderActivity() const { return currentActivity && currentActivity->isReaderActivity(); }
 
 bool ActivityManager::skipLoopDelay() const { return currentActivity && currentActivity->skipLoopDelay(); }
+
+bool ActivityManager::blocksQuickFileTransferHotkey() const {
+  return currentActivity && currentActivity->blocksQuickFileTransferHotkey();
+}
 
 void ActivityManager::requestUpdate(bool immediate) {
   if (immediate) {

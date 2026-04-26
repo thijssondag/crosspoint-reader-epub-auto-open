@@ -734,6 +734,14 @@ void CrossPointWebServer::handleUpload(UploadState& state) const {
 void CrossPointWebServer::handleUploadPost(UploadState& state) const {
   if (state.success) {
     server->send(200, "text/plain", "File uploaded successfully: " + state.fileName);
+    
+    // Call upload callback if set
+    if (uploadCallback) {
+      String filePath = state.path;
+      if (!filePath.endsWith("/")) filePath += "/";
+      filePath += state.fileName;
+      uploadCallback(filePath.c_str());
+    }
   } else {
     const String error = state.error.isEmpty() ? "Unknown error during upload" : state.error;
     server->send(400, "text/plain", error);
@@ -1474,6 +1482,11 @@ void CrossPointWebServer::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t* 
             clearEpubCacheIfNeeded(filePath);
             wsServer->sendTXT(num, "DONE");
             wsLastProgressSent = 0;
+            
+            // Call upload callback if set
+            if (uploadCallback) {
+              uploadCallback(filePath.c_str());
+            }
             break;
           }
 
@@ -1544,6 +1557,11 @@ void CrossPointWebServer::onWebSocketEvent(uint8_t num, WStype_t type, uint8_t* 
 
         wsServer->sendTXT(num, "DONE");
         wsLastProgressSent = 0;
+        
+        // Call upload callback if set
+        if (uploadCallback) {
+          uploadCallback(filePath.c_str());
+        }
       }
       break;
     }

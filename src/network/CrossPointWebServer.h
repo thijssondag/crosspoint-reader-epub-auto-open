@@ -48,6 +48,8 @@ class CrossPointWebServer {
     UploadState() { buffer.resize(UPLOAD_BUFFER_SIZE); }
   } upload;
 
+  using UploadCallback = std::function<void(const std::string& path)>;
+
   CrossPointWebServer();
   ~CrossPointWebServer();
 
@@ -68,6 +70,9 @@ class CrossPointWebServer {
   // Get the port number
   uint16_t getPort() const { return port; }
 
+  // Set callback for when files are uploaded
+  void setUploadCallback(UploadCallback callback) { uploadCallback = callback; }
+
  private:
   std::unique_ptr<WebServer> server = nullptr;
   std::unique_ptr<WebSocketsServer> wsServer = nullptr;
@@ -77,6 +82,7 @@ class CrossPointWebServer {
   uint16_t wsPort = 81;  // WebSocket port
   NetworkUDP udp;
   bool udpActive = false;
+  UploadCallback uploadCallback;
 
   // WebSocket upload state
   void onWebSocketEvent(uint8_t num, WStype_t type, uint8_t* payload, size_t length);

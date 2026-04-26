@@ -44,6 +44,9 @@ class Activity {
   virtual bool preventAutoSleep() { return false; }
   virtual bool isReaderActivity() const { return false; }
 
+  // When true, main loop long-press Back must not start Quick File Transfer (sub-flows, already in transfer).
+  virtual bool blocksQuickFileTransferHotkey() const { return false; }
+
   // Start a new activity without destroying the current one
   // Note: requestUpdate() will be invoked automatically once resultHandler finishes
   void startActivityForResult(std::unique_ptr<Activity>&& activity, ActivityResultHandler resultHandler);

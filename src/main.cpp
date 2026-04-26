@@ -365,6 +365,20 @@ void loop() {
     screenshotButtonsReleased = true;
   }
 
+  // Quick file transfer on long-press Back (avoid stacking WiFi picker / transfer UI)
+  constexpr uint32_t QUICK_TRANSFER_HOLD_MS = 2000;  // 2 second long press
+  static bool quickTransferTriggered = false;
+  if (!activityManager.blocksQuickFileTransferHotkey() &&
+      mappedInputManager.isPressed(MappedInputManager::Button::Back) &&
+      mappedInputManager.getHeldTime() > QUICK_TRANSFER_HOLD_MS && !quickTransferTriggered) {
+    quickTransferTriggered = true;
+    LOG_DBG("MAIN", "Quick file transfer triggered by long Back press");
+    activityManager.goToQuickFileTransfer();
+  }
+  if (!mappedInputManager.isPressed(MappedInputManager::Button::Back)) {
+    quickTransferTriggered = false;
+  }
+
   const unsigned long sleepTimeoutMs = SETTINGS.getSleepTimeoutMs();
   if (millis() - lastActivityTime >= sleepTimeoutMs) {
     LOG_DBG("SLP", "Auto-sleep triggered after %lu ms of inactivity", sleepTimeoutMs);

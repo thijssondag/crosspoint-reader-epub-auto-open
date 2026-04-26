@@ -1,5 +1,39 @@
 # CrossPoint Reader
 
+## This fork: quick “receive & open” for Send to X4
+
+This repository is **[CrossPoint Reader](https://github.com/crosspoint-reader/crosspoint-reader)** with a small set of changes so you can **push EPUBs from your phone to the reader and have the book open immediately**—a great match for **[Send to X4](https://www.chapiware.com/send-to-x4/)** (Android / iOS / browser) by **Chapiware**: install the app, join the **same Wi‑Fi** as the X4 running this firmware, send an article or EPUB, and the device can grab the file and jump straight into the reader without digging through the file browser.
+
+**Disclaimer — use at your own risk**
+
+The changes in this fork were developed with help from **[Cursor](https://cursor.com/)** (AI-assisted editing in Cursor IDE). This is **unofficial** firmware: **you use it entirely at your own risk**. There is **no warranty**; neither the maintainer(s) nor Cursor are responsible for bricked devices, data loss, security issues, or any other harm. Keep a recovery path (e.g. official CrossPoint or stock firmware flashing) before you experiment.
+
+**Why we changed the firmware**
+
+- **Send to X4** talks to the reader over **local Wi‑Fi** (no cloud). CrossPoint already exposes a web file transfer UI; we wanted that flow to be **one gesture on the device** and **one less step after upload** (open the book automatically).
+- We use **station (STA) mode**: the reader **joins your remembered Wi‑Fi** (same network as the phone), not a device hotspot, which matches how Send to X4 expects to reach the X4 on your LAN.
+
+**What we added (summary)**
+
+| Area | Change |
+|------|--------|
+| **Gesture** | **Long-press Back** (~2s) from most screens starts **Quick File Transfer** (won’t double-fire while you’re in the Wi‑Fi picker or keyboard). |
+| **Network** | Opens **`WifiSelectionActivity`** with **auto-connect** to the **last saved** network when possible; otherwise the normal network list. |
+| **After upload** | **`CrossPointWebServer`** accepts an optional **upload callback**; the first completed upload triggers **`goToReader(path)`** so the EPUB (or other supported file) **opens immediately**. |
+| **UI** | **Full white clear** before drawing the transfer screen so the previous UI doesn’t ghost on e‑ink. |
+| **Plumbing** | `ActivityManager::goToQuickFileTransfer()`, `Activity::blocksQuickFileTransferHotkey()` so sub-flows aren’t interrupted by the global long-press. |
+
+**Upstream & license**
+
+- All original CrossPoint code and docs remain **MIT** and belong to the **CrossPoint** project and its contributors.
+- This fork is for personal/convenience use; **send kudos to [Chapiware](https://www.chapiware.com/send-to-x4/)** for Send to X4.
+
+**Repository mirror note**
+
+This GitHub repo may ship **without** the upstream `.github/` folder (issue templates, Actions workflows) so it can be pushed from tools that lack GitHub’s `workflow` OAuth scope. For CI and release automation, copy `.github` from **[crosspoint-reader/crosspoint-reader](https://github.com/crosspoint-reader/crosspoint-reader)** or push with a token that includes **`workflow`** scope.
+
+---
+
 Firmware for the **Xteink X4** e-paper display reader (unaffiliated with Xteink).
 Built using **PlatformIO** and targeting the **ESP32-C3** microcontroller.
 
